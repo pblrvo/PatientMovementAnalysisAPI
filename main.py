@@ -1,15 +1,12 @@
 # main.py
 from fastapi import FastAPI, File, UploadFile, HTTPException
-from typing import Any
 from pydantic import BaseModel
 import numpy as np
 import tensorflow as tf
 from src.json_file_keypoint_extraction import KeypointProcessor
 import json
 
-# Load the model
 model = tf.keras.models.load_model("model/video_classifier_model.keras")
-
 app = FastAPI()
 
 class KeypointsInput(BaseModel):
