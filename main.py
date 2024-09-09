@@ -10,6 +10,12 @@ model = tf.keras.models.load_model("model/video_classifier_model.keras")
 app = FastAPI()
 
 class KeypointsInput(BaseModel):
+    """
+    Pydantic model for validating keypoints input.
+    
+    Attributes:
+        keypoints: A list representing the keypoints.
+    """
     keypoints: list
 
 processor = KeypointProcessor(max_seq_length=370)
@@ -22,6 +28,21 @@ class_mapping = {
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)) -> str:
+    """
+    Predicts the class label for a video based on its keypoints.
+
+    Args:
+        file (UploadFile): The uploaded file containing keypoints data in JSON format.
+
+    Returns:
+        str: The predicted class label ("NORMAL", "MILD", "MODERATE", or "SEVERE").
+
+    Raises:
+        HTTPException: 
+            - 400 Bad Request: If the uploaded file is not a valid JSON, has an invalid format, 
+                               or contains no keypoints.
+            - 500 Internal Server Error: If an error occurs during prediction.
+    """
     try:
         contents = await file.read()
         try:
@@ -58,4 +79,3 @@ async def predict(file: UploadFile = File(...)) -> str:
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
